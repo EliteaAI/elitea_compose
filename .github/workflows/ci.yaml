@@ -37,11 +37,20 @@ jobs:
           "$RUNNER_TEMP/uv/bin/pip" install uv
           echo "$RUNNER_TEMP/uv/bin" >> "$GITHUB_PATH"
 
-      # terraform_fmt hook needs a terraform binary on PATH (installed into ~/.local/bin by `make get_tools`, needs curl + unzip)
+      # terraform_fmt hook needs a terraform binary on PATH. Installed without unzip (python3 -m zipfile);
+      # the version is taken from the Makefile so CI and `make get_tools` stay in sync.
       - name: Ensure terraform
         run: |
-          command -v terraform >/dev/null || [ -x "$HOME/.local/bin/terraform" ] || make get_tools
+          if ! command -v terraform >/dev/null && [ ! -x "$HOME/.local/bin/terraform" ]; then
+            v=$(sed -n 's/^TERRAFORM_VERSION ?= //p' Makefile)
+            case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; *) arch=amd64 ;; esac
+            mkdir -p "$HOME/.local/bin"
+            curl -fsSL -o "$RUNNER_TEMP/tf.zip" "https://releases.hashicorp.com/terraform/${v}/terraform_${v}_linux_${arch}.zip"
+            python3 -m zipfile -e "$RUNNER_TEMP/tf.zip" "$RUNNER_TEMP/tf"
+            install -m 0755 "$RUNNER_TEMP/tf/terraform" "$HOME/.local/bin/terraform"
+          fi
           command -v terraform >/dev/null || echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          PATH="$HOME/.local/bin:$PATH" terraform version
 
       - name: Lint (strict, dummy secrets)
         run: uv run prek -a
