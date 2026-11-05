@@ -1,0 +1,13 @@
+[project]
+name = "elitea_compose"
+version = "0.0.1"
+description = "Elitea deployment with docker compose"
+authors = [
+    {name = "Roman Mezentsev",email = "roman_mezentsev@epam.com"}
+]
+license = {text = "Apache-2.0 license"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "prek==0.3.3",
+]

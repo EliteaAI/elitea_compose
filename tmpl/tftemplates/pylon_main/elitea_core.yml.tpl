@@ -1,0 +1,67 @@
+---
+event_node:
+  type: RedisEventNode
+  host: $${REDIS_HOST}
+  port: $${REDIS_PORT}
+  password: $${REDIS_PASSWORD}
+  event_queue: $${NAME_PREFIX}_indexer_${EVENT_RND}
+  hmac_key: $${INDEXER_HMAC_KEY}
+  hmac_digest: sha512
+  callback_workers: null
+  mute_first_failed_connections: 10
+  use_ssl: $${REDIS_SSL}
+  log_errors: true
+
+%{ if SELF_HTTPS_ENABLED }
+base_url: https://$${APP_HOST}
+%{ else }
+base_url: http://pylon_main:8080
+%{ endif }
+
+nltk_data: /data/cache/nltk
+
+icons_base_path: /data/static
+
+auto_setup: true
+ai_project_allowed_domains: "$${AI_PROJECT_ALLOWED_DOMAINS}"
+add_admin_roles:
+  [
+    "system",
+    "admin",
+    "editor",
+    "viewer",
+    "prompt_lib_public",
+    "prompt_lib_moderators",
+    "public_admin",
+  ]
+
+default_secret_keys:
+  - auth_token
+  - default_embedding_model_name
+  - default_embedding_model_project_id
+  - default_image_generation_model_name
+  - default_image_generation_model_project_id
+  - default_llm_high_tier_model_name
+  - default_llm_high_tier_model_project_id
+  - default_llm_low_tier_model_name
+  - default_llm_low_tier_model_project_id
+  - default_llm_mid_tier_model_name
+  - default_llm_mid_tier_model_project_id
+  - default_llm_model_name
+  - default_llm_model_project_id
+  - default_vectorstorage_model_name
+  - default_vectorstorage_model_project_id
+  - pgvector_project_connstr
+  - pgvector_project_password
+  - project_llm_key
+
+default_release: $${ELITEA_RELEASE}
+
+disable_monitoring_charts:
+  - sentiment
+  - relevancy
+  - reliability
+  - promptQuality
+  - promptScatter
+  - topicPrompt
+  - topicChart

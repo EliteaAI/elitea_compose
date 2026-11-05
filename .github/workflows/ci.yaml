@@ -1,0 +1,83 @@
+---
+name: CI
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# One run per ref: a new push cancels the previous run of the same branch / PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Runner: repository variable RUNNER_LABELS, e.g. ["self-hosted","linux","x64"]; GitHub-hosted if unset.
+# Fork PRs always run on GitHub-hosted runners (untrusted code must not reach the self-hosted one).
+# The self-hosted image needs: uv, docker (compose v2), curl, unzip, trivy.
+jobs:
+  lint:
+    timeout-minutes: 10
+    # yamllint disable-line rule:line-length
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(vars.RUNNER_LABELS || '"ubuntu-latest"') || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Lint (strict, dummy secrets)
+        run: uv run prek -a
+
+      - name: start.sh syntax
+        run: bash -n start.sh
+
+  # Renders docker-compose.yml from the templates for each scenario in .ci/scenarios and validates it.
+  # Catches template/YAML breakage that lint cannot see. Needs no secrets, starts no containers.
+  render:
+    name: render (${{ matrix.scenario }})
+    timeout-minutes: 15
+    # yamllint disable-line rule:line-length
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(vars.RUNNER_LABELS || '"ubuntu-latest"') || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [quick, full]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Terraform
+        run: '[ -x "$HOME/.local/bin/terraform" ] || make get_tools'
+
+      - name: Render configs
+        run: |
+          make init
+          set -a
+          . ".ci/scenarios/${{ matrix.scenario }}.env"
+          set +a
+          make apply
+
+      - name: Validate docker-compose.yml
+        run: docker compose -f docker-compose.yml config -q
+
+  commits:
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+    # yamllint disable-line rule:line-length
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(vars.RUNNER_LABELS || '"ubuntu-latest"') || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      # system python3 + venv: setup-python has no builds for the Debian self-hosted runner
+      - name: Conventional commits
+        run: |
+          python3 -m venv "$RUNNER_TEMP/cz"
+          "$RUNNER_TEMP/cz/bin/pip" install commitizen
+          "$RUNNER_TEMP/cz/bin/cz" check --rev-range "origin/${{ github.base_ref }}..HEAD"
+
+      # with squash merge the PR title becomes the commit on main
+      - name: PR title is a conventional commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: '"$RUNNER_TEMP/cz/bin/cz" check --message "$PR_TITLE"'
