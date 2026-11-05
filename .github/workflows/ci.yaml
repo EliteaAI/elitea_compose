@@ -26,6 +26,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The runner service has its own PATH: look for uv in the usual places, else install it into a venv
+      - name: Ensure uv
+        run: |
+          for d in "$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/bin /opt/uv/bin; do
+            [ -x "$d/uv" ] && echo "$d" >> "$GITHUB_PATH" && exit 0
+          done
+          command -v uv >/dev/null && exit 0
+          python3 -m venv "$RUNNER_TEMP/uv"
+          "$RUNNER_TEMP/uv/bin/pip" install uv
+          echo "$RUNNER_TEMP/uv/bin" >> "$GITHUB_PATH"
+
       - name: Lint (strict, dummy secrets)
         run: uv run prek -a
 
