@@ -37,6 +37,12 @@ jobs:
           "$RUNNER_TEMP/uv/bin/pip" install uv
           echo "$RUNNER_TEMP/uv/bin" >> "$GITHUB_PATH"
 
+      # terraform_fmt hook needs a terraform binary on PATH (installed into ~/.local/bin by `make get_tools`, needs curl + unzip)
+      - name: Ensure terraform
+        run: |
+          command -v terraform >/dev/null || [ -x "$HOME/.local/bin/terraform" ] || make get_tools
+          command -v terraform >/dev/null || echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Lint (strict, dummy secrets)
         run: uv run prek -a
 

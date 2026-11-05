@@ -33,7 +33,7 @@ resource "local_file" "pylon_indexer_worker" {
       ELITEA_RELEASE     = var.ELITEA_RELEASE
       ELITEA_REMOTE_REPO = var.ELITEA_REMOTE_REPO
       CA_ENABLED         = var.CA_ENABLED
-      PG_CLOUD     = var.PG_CLOUD
+      PG_CLOUD           = var.PG_CLOUD
     }
   )
   filename = "../pylon_indexer/configs/indexer_worker.yml"
