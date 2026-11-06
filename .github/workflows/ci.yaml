@@ -17,7 +17,7 @@ concurrency:
 
 # Runner: repository variable RUNNER_LABELS, e.g. ["self-hosted","linux","x64"]; GitHub-hosted if unset.
 # Fork PRs always run on GitHub-hosted runners (untrusted code must not reach the self-hosted one).
-# The self-hosted image needs: uv, docker (compose v2), curl, unzip, trivy.
+# The self-hosted image needs: uv, python3 (stdlib only, no pip/venv), curl, trivy (no Docker).
 jobs:
   lint:
     timeout-minutes: 10
@@ -26,31 +26,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # The runner service has its own PATH: look for uv in the usual places, else install it into a venv
+      # The runner service has its own PATH: look for uv in the usual places
       - name: Ensure uv
         run: |
           for d in "$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/bin /opt/uv/bin; do
             [ -x "$d/uv" ] && echo "$d" >> "$GITHUB_PATH" && exit 0
           done
-          command -v uv >/dev/null && exit 0
-          python3 -m venv "$RUNNER_TEMP/uv"
-          "$RUNNER_TEMP/uv/bin/pip" install uv
-          echo "$RUNNER_TEMP/uv/bin" >> "$GITHUB_PATH"
+          command -v uv >/dev/null
 
-      # terraform_fmt hook needs a terraform binary on PATH. Installed without unzip (python3 -m zipfile);
-      # the version is taken from the Makefile so CI and `make get_tools` stay in sync.
+      # terraform_fmt hook needs a terraform binary on PATH
       - name: Ensure terraform
-        run: |
-          if ! command -v terraform >/dev/null && [ ! -x "$HOME/.local/bin/terraform" ]; then
-            v=$(sed -n 's/^TERRAFORM_VERSION ?= //p' Makefile)
-            case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; *) arch=amd64 ;; esac
-            mkdir -p "$HOME/.local/bin"
-            curl -fsSL -o "$RUNNER_TEMP/tf.zip" "https://releases.hashicorp.com/terraform/${v}/terraform_${v}_linux_${arch}.zip"
-            python3 -m zipfile -e "$RUNNER_TEMP/tf.zip" "$RUNNER_TEMP/tf"
-            install -m 0755 "$RUNNER_TEMP/tf/terraform" "$HOME/.local/bin/terraform"
-          fi
-          command -v terraform >/dev/null || echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          PATH="$HOME/.local/bin:$PATH" terraform version
+        run: .ci/install-terraform.sh
 
       - name: Lint (strict, dummy secrets)
         run: uv run prek -a
@@ -73,7 +59,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install Terraform
-        run: '[ -x "$HOME/.local/bin/terraform" ] || make get_tools'
+        run: .ci/install-terraform.sh
 
       - name: Render configs
         run: |
@@ -83,8 +69,11 @@ jobs:
           set +a
           make apply
 
+      # no Docker on the runner: the standalone compose binary validates the file without a daemon
       - name: Validate docker-compose.yml
-        run: docker compose -f docker-compose.yml config -q
+        run: |
+          compose=$(.ci/install-compose.sh)
+          "$compose" -f docker-compose.yml config -q
 
   commits:
     if: github.event_name == 'pull_request'
@@ -95,15 +84,18 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      # system python3 + venv: setup-python has no builds for the Debian self-hosted runner
-      - name: Conventional commits
+      - name: Ensure uv
         run: |
-          python3 -m venv "$RUNNER_TEMP/cz"
-          "$RUNNER_TEMP/cz/bin/pip" install commitizen
-          "$RUNNER_TEMP/cz/bin/cz" check --rev-range "origin/${{ github.base_ref }}..HEAD"
+          for d in "$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/bin /opt/uv/bin; do
+            [ -x "$d/uv" ] && echo "$d" >> "$GITHUB_PATH" && exit 0
+          done
+          command -v uv >/dev/null
+
+      - name: Conventional commits
+        run: uvx --from commitizen cz check --rev-range "origin/${{ github.base_ref }}..HEAD"
 
       # with squash merge the PR title becomes the commit on main
       - name: PR title is a conventional commit
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: '"$RUNNER_TEMP/cz/bin/cz" check --message "$PR_TITLE"'
+        run: uvx --from commitizen cz check --message "$PR_TITLE"
