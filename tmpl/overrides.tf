@@ -20,6 +20,9 @@ resource "local_file" "override" {
       PROXY_HTTP         = var.PROXY_ENABLED_HTTP
       PROXY_HTTPS        = var.PROXY_ENABLED_HTTPS
       PROXY_NO_PROXY     = var.PROXY_ENABLED_NO_PROXY
+      GITHUB_AUTH        = var.GITHUB_AUTH
+      GITHUB_USER        = var.GITHUB_USER
+      GITHUB_TOKEN       = var.GITHUB_TOKEN
       REDIS_HOST         = var.REDIS_HOST
       PGSQL_HOST         = var.PGSQL_HOST
       REDIS_PORT         = var.REDIS_PORT
