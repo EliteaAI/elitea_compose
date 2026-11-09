@@ -16,10 +16,14 @@ Supported hosts: **Ubuntu, Debian, RHEL family (RHEL / Rocky / Alma / CentOS / F
 
 | | |
 |---|---|
+| CPU | **6 vCPU** minimum, 12 vCPU recommended |
+| RAM | **8 GB** minimum, 16 GB recommended |
 | Disk | **30 GB** free (the script checks this) |
 | Network | Internet access to pull container images and download Terraform |
 | Rights | `sudo` only if Docker / `make` / `unzip` have to be installed. If they are already there, no root is needed |
 | Docker | Not required up front – `start.sh` offers to install it (Linux) |
+
+> **Note:** the first startup bootstraps the platform and can take up to 15 minutes, depending on your internet connection and system performance.
 
 ### 1. Run the script
 
