@@ -17,6 +17,7 @@ resource "local_file" "bootstrap_pylon_deepwiki" {
     "${path.module}/tftemplates/pylon_deepwiki/bootstrap_deepwiki.yml.tpl",
     {
       ELITEA_REMOTE_REPO = var.ELITEA_REMOTE_REPO
+      GITHUB_AUTH        = var.GITHUB_AUTH
       PROXY_ENABLED      = var.PROXY_ENABLED
       ELITEA_RELEASE     = var.ELITEA_RELEASE
       MESH_ENABLED       = var.MESH_ENABLED

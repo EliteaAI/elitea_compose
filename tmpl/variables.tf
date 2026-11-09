@@ -198,6 +198,25 @@ variable "PROXY_ENABLED_NO_PROXY" {
   description = "Proxy NO_PROXY"
 }
 
+variable "GITHUB_AUTH" {
+  type        = bool
+  default     = false
+  description = "Use GitHub credentials to fetch Elitea plugins from the standard repo"
+}
+
+variable "GITHUB_USER" {
+  type        = string
+  default     = ""
+  description = "GitHub user for the plugin repo"
+}
+
+variable "GITHUB_TOKEN" {
+  type        = string
+  default     = ""
+  sensitive   = true
+  description = "GitHub token for the plugin repo"
+}
+
 variable "EXTERNAL_PGSQL_SVC_ENABLED" {
   type        = bool
   default     = false

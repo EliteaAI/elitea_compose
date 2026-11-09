@@ -145,6 +145,7 @@ if [ "$QUICK" = "true" ]; then
   export SSO_ENABLED=false SSO_MODE=form ALLOWED_DOMAINS="centry.user"
   export APP_HOST="${APP_HOST:-${DETECTED_IP:-localhost}}"
   export PYLON_VER=1.2.28 TOOLS_ENABLED=false ELITEA_RELEASE=2.0.7 ELITEA_REMOTE_REPO=1
+  export GITHUB_AUTH=false
   export REDIS_VER=8.10.3-alpine PG_VECTOR_VERSION=0.8.7-pg18-trixie PGSQL_USER=eliteausr POSTGRES_USER=eliteausr PGSQL_DB=eliteadb POSTGRES_DB=eliteadb
   export PG_CLOUD=false EXTERNAL_PGSQL_SVC_ENABLED=false PG_CUSTOM_CONFIG_ENABLED=false
   export SHARED_REDIS=false AWS_REDIS=false REDIS_SSL=false EXTERNAL_REDIS_SVC_ENABLED=false EXTERNAL_SVC_ENABLED=false
@@ -372,6 +373,26 @@ printf "Enter ELITEA repository [ (1 - standard, 2 - internal repo ), default: 1
 IFS= read -r al_remote_repo
 ELITEA_REMOTE_REPO=${al_remote_repo:-1}
 export ELITEA_REMOTE_REPO
+
+GITHUB_AUTH=false
+if [ "$ELITEA_REMOTE_REPO" = "1" ]; then
+  printf "Use GitHub credentials to fetch ELITEA plugins? yes/no [default: no]: "
+  IFS= read -r github_auth_enabled
+  github_auth_norm=$(printf "%s" "${github_auth_enabled:-no}" | tr '[:upper:]' '[:lower:]')
+  case "$github_auth_norm" in
+    true|1|yes|y) GITHUB_AUTH=true ;;
+  esac
+  unset github_auth_norm
+  if [ "$GITHUB_AUTH" = "true" ]; then
+    printf "Enter GitHub user: "
+    IFS= read -r GITHUB_USER
+    export GITHUB_USER
+    printf "Enter GitHub token: "
+    IFS= read -r GITHUB_TOKEN
+    export GITHUB_TOKEN
+  fi
+fi
+export GITHUB_AUTH
 
 printf "Would you use external PGSQL service? yes/no [default: no]: "
 IFS= read -r external_pgsql_enabled
@@ -812,6 +833,9 @@ fi
                       echo  "export PYLON_VER=$PYLON_VER" >> inputs.env
                       echo  "export ELITEA_RELEASE=$ELITEA_RELEASE" >> inputs.env
                       echo  "export ELITEA_REMOTE_REPO=$ELITEA_REMOTE_REPO" >> inputs.env
+                      echo  "export GITHUB_AUTH=$GITHUB_AUTH" >> inputs.env
+                      [ -n "$GITHUB_USER" ] && echo  "export GITHUB_USER=$GITHUB_USER" >> inputs.env
+                      [ -n "$GITHUB_TOKEN" ] && echo  "export GITHUB_TOKEN=$GITHUB_TOKEN" >> inputs.env
                       echo  "export EXTERNAL_SVC_ENABLED=$EXTERNAL_SVC_ENABLED" >> inputs.env
                       [ -n "$PGSQL_HOST" ] && echo  "export PGSQL_HOST=$PGSQL_HOST" >> inputs.env
                       [ -n "$PGSQL_PORT" ] && echo  "export PGSQL_PORT=$PGSQL_PORT" >> inputs.env

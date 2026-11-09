@@ -28,7 +28,10 @@ plugin_repo:
     release: $${ELITEA_RELEASE}
     add_source_data: false
     add_head_data: false
-
+%{ if GITHUB_AUTH }
+    license_user: $${GITHUB_USER}
+    license_password: $${GITHUB_TOKEN}
+%{ endif }
 %{ else }
 %{ if ELITEA_REMOTE_REPO == "2" }
 # Internal repo
