@@ -4,7 +4,7 @@ SHELL := /bin/bash
 FREE_SPACE_THRESHOLD ?= 30
 PG_VECTOR_VERSION ?= 0.8.7-pg18-trixie
 REDIS_VER ?= 8.10.3-alpine
-PYLON_VER ?= 1.2.28
+PYLON_VER ?= 1.2.31
 TOOLS_ENABLED ?= false
 HTTP_HOST_PORT ?= 80
 HTTPS_HOST_PORT ?= 443
@@ -102,7 +102,7 @@ define RMR
 rm -rf $(1) 2>/dev/null || docker run --rm -v "$(CURDIR)":/w -w /w --entrypoint rm redis:$(REDIS_VER) -rf $(1)
 endef
 
-ELITEA_RELEASE ?= 2.0.7
+ELITEA_RELEASE ?= 2.0.8
 ELITEA_REMOTE_REPO ?= 1
 ADMIN_PASSWORD ?= admin
 APP_AUTH_SECRET ?=

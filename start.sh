@@ -9,7 +9,7 @@ printf " |  __| | |      | |    | |  |  __|      / /\\ \\     | |  \n"
 printf " | |____| |____ _| |_   | |  | |____    / ____ \\   _| |_  \n"
 printf " |______|______|_____|  |_|  |______|  /_/    \\_\\ |_____| \n"
 printf "                                                               \n"
-printf "                                                  v2.0.7      \n"
+printf "                                                  v2.0.8      \n"
 printf " \n"
 printf " \n"
 printf " \n"
@@ -144,7 +144,7 @@ if [ "$QUICK" = "true" ]; then
   export HTTP_HOST_PORT=$DEFAULT_HTTP_PORT LB_HTTPS=false SELF_HTTPS=false PROXY_ENABLED=false CA_ENABLED=false
   export SSO_ENABLED=false SSO_MODE=form ALLOWED_DOMAINS="centry.user"
   export APP_HOST="${APP_HOST:-${DETECTED_IP:-localhost}}"
-  export PYLON_VER=1.2.28 TOOLS_ENABLED=false ELITEA_RELEASE=2.0.7 ELITEA_REMOTE_REPO=1
+  export PYLON_VER=1.2.31 TOOLS_ENABLED=false ELITEA_RELEASE=2.0.8 ELITEA_REMOTE_REPO=1
   export GITHUB_AUTH=false
   export REDIS_VER=8.10.3-alpine PG_VECTOR_VERSION=0.8.7-pg18-trixie PGSQL_USER=eliteausr POSTGRES_USER=eliteausr PGSQL_DB=eliteadb POSTGRES_DB=eliteadb
   export PG_CLOUD=false EXTERNAL_PGSQL_SVC_ENABLED=false PG_CUSTOM_CONFIG_ENABLED=false
@@ -348,9 +348,9 @@ fi
 
 printf "\nConfiguring ELITEA...\n"
 
-printf "Enter Pylon version [default: 1.2.28]: "
+printf "Enter Pylon version [default: 1.2.31]: "
 IFS= read -r pylon_ver
-PYLON_VER=${pylon_ver:-1.2.28}
+PYLON_VER=${pylon_ver:-1.2.31}
 export PYLON_VER
 
 printf "Enable Pylon tools image? yes/no [default: no]: "
@@ -364,9 +364,9 @@ else
 fi
 export TOOLS_ENABLED
 
-printf "Enter elita release [ (2.0.6, 2.0.7), default: 2.0.7]: "
+printf "Enter elita release [ (2.0.7, 2.0.8), default: 2.0.8]: "
 IFS= read -r al_release
-ELITEA_RELEASE=${al_release:-2.0.7}
+ELITEA_RELEASE=${al_release:-2.0.8}
 export ELITEA_RELEASE
 
 printf "Enter ELITEA repository [ (1 - standard, 2 - internal repo ), default: 1]: "
