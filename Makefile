@@ -1,10 +1,10 @@
-.PHONY: help up up_minimal stop down restart initial_check prepare_ubuntu prepare_rocky get_tools init plan apply clean_tf clean_images clean_volumes clean_local_db clean_cache clean_start full_clean check_config
+.PHONY: help up up_minimal stop down initial_check prepare_ubuntu prepare_rocky get_tools init plan apply clean_tf clean_images clean_volumes clean_local_db clean_cache clean_start full_clean check_config
 
 SHELL := /bin/bash
 FREE_SPACE_THRESHOLD ?= 30
 PG_VECTOR_VERSION ?= 0.8.7-pg18-trixie
 REDIS_VER ?= 8.10.3-alpine
-PYLON_VER ?= 1.2.28
+PYLON_VER ?= 1.2.31
 TOOLS_ENABLED ?= false
 HTTP_HOST_PORT ?= 80
 HTTPS_HOST_PORT ?= 443
@@ -102,7 +102,7 @@ define RMR
 rm -rf $(1) 2>/dev/null || docker run --rm -v "$(CURDIR)":/w -w /w --entrypoint rm redis:$(REDIS_VER) -rf $(1)
 endef
 
-ELITEA_RELEASE ?= 2.0.7
+ELITEA_RELEASE ?= 2.0.8
 ELITEA_REMOTE_REPO ?= 1
 ADMIN_PASSWORD ?= admin
 APP_AUTH_SECRET ?=
@@ -128,21 +128,13 @@ help: ## Show this help
 	@echo "  up_minimal       - start minimal working configuration"
 	@echo "  stop             - stop containers"
 	@echo "  down             - down docker compose"
-	@echo "  restart          - recreate all containers"
-	@echo "  restart_dp|restart_img|restart_inv - recreate deepwiki|imagegen|inventory"
-	@echo "  logs             - show logs flow (all containers)"
-	@echo "  logs_main|logs_auth|logs_indexer|logs_deepwiki|logs_inventory|logs_imagegen - show logs of one service"
-	@echo "  check            - check section"
 	@echo "  check_config     - validate override.env and docker-compose.yml"
-	@echo "  bump_release     - change ELITEA_RELEASE version"
 	@echo "  clean_images     - remove docker images only"
 	@echo "  clean_volumes    - remove docker volumes only"
 	@echo "  clean_local_db   - remove local pylon DBs"
 	@echo "  clean_cache      - remove plugins, requirements and cache dirs"
-	@echo "  clean_local_plugins - alias for clean_cache"
-	@echo "  clean_local_cache   - alias for clean_cache"
 	@echo "  clean_start      - remove local files (keep images/volumes)"
-	@echo "  clean_full       - full remove sequence"
+	@echo "  full_clean       - full remove sequence"
 	@echo "  clean_tf         - remove terraform files"
 	@echo "  init|plan|apply  - terraform workflow"
 	@echo "  get_tools        - download terraform"

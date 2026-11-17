@@ -154,8 +154,8 @@ Legend for the *Recommendation* column: **prod** = what we advise for a long-liv
 
 | Setting | Variable | Default | Recommendation |
 |---------|----------|---------|----------------|
-| Pylon version | `PYLON_VER` | `1.2.28` | Keep the default. **prod:** pin explicitly and upgrade deliberately |
-| Elitea release | `ELITEA_RELEASE` | `2.0.7` (also `2.0.6`) | Pin; never use a floating tag in production |
+| Pylon version | `PYLON_VER` | `1.2.31` | Keep the default. **prod:** pin explicitly and upgrade deliberately |
+| Elitea release | `ELITEA_RELEASE` | `2.0.8` (also `2.0.6`) | Pin; never use a floating tag in production |
 | Pylon tools image | `TOOLS_ENABLED` | `no` | Use the Pylon *tools* image variant. Leave `no` unless you need it |
 | Elitea repository | `ELITEA_REMOTE_REPO` | `1` (standard) | `2` only if your organisation runs an internal mirror |
 | pgvector image | `PG_VECTOR_VER` / `PG_VECTOR_VERSION` | `0.8.7-pg18-trixie` | Keep. Changing the PostgreSQL **major** version of an existing volume needs a dump/restore |
@@ -338,7 +338,7 @@ tmpl/tftemplates/   ← templates of docker-compose.yml, envs and pylon configs
 docker-compose.yml, envs/override.env, pylon_*/   ← generated (git-ignored)
 ```
 
-Core services: `postgres` (pgvector), `redis`, `pylon_auth`, `pylon_main`, `pylon_indexer`. Optional: `pylon_deepwiki`, `pylon_imagegen`, `pylon_inventory`, `pylon_otpl`, `ado-mcp`, Grafana MCP.
+Core services: `postgres` (pgvector), `redis`, `pylon_auth`, `pylon_main`, `pylon_indexer`. Optional: `pylon_deepwiki`, `pylon_imagegen`, `pylon_inventory`, `pylon_otpl`, `ado-mcp`, `grafana-mcp`.
 
 ## License
 

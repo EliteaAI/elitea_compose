@@ -12,7 +12,7 @@ variable "REDIS_VER" {
 
 variable "PYLON_VER" {
   type        = string
-  default     = "1.2.28"
+  default     = "1.2.31"
   description = "Pylon version"
 }
 
@@ -71,7 +71,7 @@ variable "APP_HOST" {
 
 variable "ELITEA_RELEASE" {
   type        = string
-  default     = "2.0.7"
+  default     = "2.0.8"
   description = "Alita release"
 }
 
