@@ -338,7 +338,7 @@ tmpl/tftemplates/   ← templates of docker-compose.yml, envs and pylon configs
 docker-compose.yml, envs/override.env, pylon_*/   ← generated (git-ignored)
 ```
 
-Core services: `postgres` (pgvector), `redis`, `pylon_auth`, `pylon_main`, `pylon_indexer`. Optional: `pylon_deepwiki`, `pylon_imagegen`, `pylon_inventory`, `pylon_otpl`, `ado-mcp`, Grafana MCP.
+Core services: `postgres` (pgvector), `redis`, `pylon_auth`, `pylon_main`, `pylon_indexer`. Optional: `pylon_deepwiki`, `pylon_imagegen`, `pylon_inventory`, `pylon_otpl`, `ado-mcp`, `grafana-mcp`.
 
 ## License
 
