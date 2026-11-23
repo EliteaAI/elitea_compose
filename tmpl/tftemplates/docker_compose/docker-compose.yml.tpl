@@ -1,4 +1,5 @@
 ---
+name: elitea_ai
 
 services:
   %{~ if !EXTERNAL_REDIS_SVC ~}
