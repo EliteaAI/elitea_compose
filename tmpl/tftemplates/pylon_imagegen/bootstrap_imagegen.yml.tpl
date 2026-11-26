@@ -23,7 +23,7 @@ plugin_repo:
     add_source_data: false
     add_head_data: false
 %{ if GITHUB_AUTH }
-    license_user: $${GITHUB_USER}
+    license_username: $${GITHUB_USER}
     license_password: $${GITHUB_TOKEN}
 %{ endif }
 %{ else }
